@@ -1,20 +1,22 @@
-artifacts = "/app/out.json"
+# dynamo-canary GUID: keep-the-original-guid-from-the-scaffold
+
+artifacts = ["/app/log_report.json"]
 
 [task]
 name = "dynamo/log-report"
-description = "Parse an Apache-style access log into a small JSON summary report."
+description = "Analyze an Apache-style access log and produce a deterministic JSON traffic report."
 
 [metadata]
-category = "data_processing_and_etl"
-subcategory = "text_processing"
-task_objective = ["transform", "generate"]
-artifact_type = ["text_or_log_file", "generated_output_artifact"]
-expert_time_estimate_hours = 0.3
-model_tested = "GPT-5.4"
-agent_tested = "Terminus-2"
-difficulty_explanation = "Parse a small access log and emit summary stats."
-solution_explanation = "Read the log, count requests/unique IPs, find the top path."
-verification_explanation = "Check the report file."
+category = "data_science"
+subcategory = "log_analysis"
+task_objective = "Generate a structured JSON report from web server access logs."
+artifact_type = "json_report"
+expert_time_estimate_hours = 1.0
+model_tested = "unknown"
+agent_tested = "unknown"
+difficulty_explanation = "The task requires parsing semi-structured Apache-style access log lines, extracting request fields, aggregating HTTP status codes, resolving ties deterministically, and producing a strict JSON report. The task is not solved by merely creating a file because the verifier checks the actual computed values."
+solution_explanation = "A correct solution reads /app/access.log, parses each valid non-empty log entry, counts total requests, groups HTTP status codes, identifies the most frequent client IP and request path using lexicographic tie-breaking, computes the error rate from 4xx and 5xx responses, and writes the exact JSON object to /app/log_report.json."
+verification_explanation = "The verifier recomputes the expected report from /app/access.log and compares the submitted /app/log_report.json against the required schema and values. It checks file existence, valid JSON, exact keys, data types, total request count, status-code counts, top IP, top path, and rounded error rate."
 
 [verifier]
 timeout_sec = 120.0
@@ -28,5 +30,5 @@ cpus = 1
 memory_mb = 2048
 storage_mb = 10240
 gpus = 0
-allow_internet = true
+allow_internet = false
 mcp_servers = []
